@@ -1,4 +1,5 @@
 #include <iostream>
+#include <strings.h>
 #include "opencv2/opencv.hpp"
 
 #define NORMAL_MODE 0
@@ -11,6 +12,8 @@
 #define ALIEN_YCrCB_MODE 7
 #define MEAN_SHIFT_FILTER 8
 #define CONTRAST_MEAN_MODE 9
+#define CAMERA_MODE 10
+#define IMAGE_MODE 11
 
 #define NUM_1 -79
 #define NUM_2 -78
@@ -69,6 +72,7 @@ void alien_hsv(Mat &src, Mat &dst, uchar hcolor);
 */
 void alien_ycrcb(Mat &src, Mat &dst, uchar cr_color, uchar cb_color);
 
+
 void contrast_mean(Mat &src, Mat &dst);
 
 int main(int argc, char **argv) {
@@ -81,27 +85,36 @@ int main(int argc, char **argv) {
         return -1;
     }
 
-    namedWindow("camera", WINDOW_AUTOSIZE);
-    namedWindow("camera processed", WINDOW_AUTOSIZE);
+    namedWindow("camera", WINDOW_NORMAL);
+    namedWindow("camera processed", WINDOW_NORMAL);
     namedWindow("histogram", WINDOW_NORMAL);
     namedWindow("histogram processed", WINDOW_NORMAL);
 
     Ptr<CLAHE> clahe = createCLAHE();
-    int poster_div = 1, level = 1;
+    int poster_div = 1, level = 1, index = 0;
     double clahe_clip_limit = 0.5, contrast_gain = 1.0, contrast_bias = 0.0, swr = 1, cwr = 1;
     char text[256];
     float distortion_k = 0.0;
     uchar hcolor = 120, cr_color = 255, cb_color = 0;
+    int camera_input = 1;
+    string src[3];
+    src[0] = "histogram_1.jpg";
+    src[1] = "histogram_2.jpg";
+    src[2] = "personas.jpg";
     while (true) {
-        capture >> frame;
-//        frame = imread("./histogram_1.jpg",CV_LOAD_IMAGE_COLOR);
+        if(camera_input){
+            capture >> frame;
+        }
+        else {
+            frame = imread(src[index],CV_LOAD_IMAGE_COLOR);
+        }
 
         imshow("camera", frame);
         imshow_hist("histogram", frame);
 
         if (mode == NORMAL_MODE) {
             processed = frame;
-            sprintf(text, "[NO FILTER] swr=%.2f cwr=%.2f lvl=%d", swr, cwr, level);
+            sprintf(text, "[NO FILTER] swr=%.2f cwr=%.2f", swr, cwr);
         }
         else if (mode == CONTRAST_G_B_MODE) {
             contrast_gain_bias(frame, processed, contrast_gain, contrast_bias);
@@ -138,7 +151,7 @@ int main(int argc, char **argv) {
         }
         else if (mode == MEAN_SHIFT_FILTER) {
             pyrMeanShiftFiltering(frame, processed, swr, cwr, level);
-            sprintf(text, "[MEAN SHIFT] swr=%.2f cwr=%.2f lvl=%d", swr, cwr, level);
+            sprintf(text, "[MEAN SHIFT] swr=%.2f cwr=%.2f", swr, cwr);
         }
         else { // CLAHE_MODE
             clahe->setClipLimit(clahe_clip_limit);
@@ -255,11 +268,16 @@ int main(int argc, char **argv) {
         else if (NUM_5 == key) {
             cwr += 1;
         }
-        else if (NUM_3 == key) {
-            level = level == 1 ? 1 : level - 1;
-        }
-        else if (NUM_6 == key) {
-            level = level == 8 ? 8 : level + 1;
+        else if ('i' == key){
+            if(!index && camera_input){
+                camera_input = 0;
+            }
+            else{
+                index ++;
+                index %= 3;
+                if(!index) camera_input = 1;
+            }
+            cout << index << "|" << camera_input << endl;
         }
     }
 
