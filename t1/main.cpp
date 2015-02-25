@@ -10,6 +10,7 @@
 #define ALIEN_HSV_MODE 6
 #define ALIEN_YCrCB_MODE 7
 #define MEAN_SHIFT_FILTER 8
+#define CONTRAST_MEAN_MODE 9
 
 #define NUM_1 -79
 #define NUM_2 -78
@@ -63,13 +64,17 @@ void poster_rt(Mat &src, Mat &dst, int div);
 */
 void alien_hsv(Mat &src, Mat &dst, uchar hcolor);
 
+/**
+* Aplica el efecto alien en el espacio de color ycrcb
+*/
 void alien_ycrcb(Mat &src, Mat &dst, uchar cr_color, uchar cb_color);
+
+void contrast_mean(Mat &src, Mat &dst);
 
 int main(int argc, char **argv) {
     int mode = NORMAL_MODE;
-    int key = -1;
+    int key;
     Mat frame, processed;
-    Mat_<Vec3b>::iterator it, itend;
 
     VideoCapture capture(0);
     if (!capture.isOpened()) {
@@ -89,6 +94,8 @@ int main(int argc, char **argv) {
     uchar hcolor = 120, cr_color = 255, cb_color = 0;
     while (true) {
         capture >> frame;
+//        frame = imread("./histogram_1.jpg",CV_LOAD_IMAGE_COLOR);
+
         imshow("camera", frame);
         imshow_hist("histogram", frame);
 
@@ -125,6 +132,10 @@ int main(int argc, char **argv) {
             alien_ycrcb(frame, processed, cr_color, cb_color);
             sprintf(text, "[A_YCrCB] cr=%d cb=%d", cr_color, cb_color);
         }
+        else if (mode == CONTRAST_MEAN_MODE) {
+            contrast_mean(frame, processed);
+            sprintf(text, "[CONTRAST MEAN]");
+        }
         else if (mode == MEAN_SHIFT_FILTER) {
             pyrMeanShiftFiltering(frame, processed, swr, cwr, level);
             sprintf(text, "[MEAN SHIFT] swr=%.2f cwr=%.2f lvl=%d", swr, cwr, level);
@@ -136,18 +147,22 @@ int main(int argc, char **argv) {
         }
 
 
-        imshow_hist("histogram processed", frame);
-        putText(frame, text, Point(10, 20), FONT_HERSHEY_PLAIN, 1.5, CV_RGB(0, 255, 0), 2);
-        imshow("camera processed", frame);
+        imshow_hist("histogram processed", processed);
+        putText(processed, text, Point(10, 20), FONT_HERSHEY_PLAIN, 1.5, CV_RGB(0, 255, 0), 2);
+        imshow("camera processed", processed);
 
 
         if ('q' == (key = char(waitKey(1))))
             break;
         else if ('c' == key) {
-            if (mode == CONTRAST_G_B_MODE) {
+            if (mode == CONTRAST_MEAN_MODE) {
                 mode = CLAHE_MODE;
-            } else {
+            }
+            else if (mode == CLAHE_MODE) {
                 mode = CONTRAST_G_B_MODE;
+            }
+            else {
+                mode = CONTRAST_MEAN_MODE;
             }
         }
         else if ('p' == key) {
@@ -192,6 +207,10 @@ int main(int argc, char **argv) {
                 distortion_k += 0.0000001;
             else if (NUM_1 == key)
                 distortion_k -= 0.0000001;
+            else if (NUM_5 == key)
+                distortion_k += 0.000001;
+            else if (NUM_2 == key)
+                distortion_k -= 0.000001;
         }
         else if (mode == POSTER_RT_MODE) {
             if (NUM_4 == key)
@@ -240,13 +259,30 @@ int main(int argc, char **argv) {
             level = level == 1 ? 1 : level - 1;
         }
         else if (NUM_6 == key) {
-            level += 1;
+            level = level == 8 ? 8 : level + 1;
         }
     }
 
     capture.release();
     destroyAllWindows();
     return 0;
+}
+
+void contrast_mean(Mat &src, Mat &dst) {
+    Mat lab_img;
+    vector<Mat> channels;
+    double min,max;
+
+    cvtColor(src, lab_img, CV_BGR2Lab);
+    split(lab_img,channels);
+    minMaxLoc(channels[0], &min, &max);
+
+    channels[0] = (channels[0] - min)*(255/(max - min));
+
+    merge(channels, lab_img);
+
+    cvtColor(lab_img, dst, CV_Lab2BGR);
+
 }
 
 void alien_ycrcb(Mat &src, Mat &dst, uchar cr_color, uchar cb_color) {
@@ -296,7 +332,6 @@ void alien_hsv(Mat &src, Mat &dst, uchar hcolor) {
 
 void poster_rt(Mat &src, Mat &dst, int div) {
     Mat YCrCb_img;
-    vector<Mat_<Vec3b>> channels;
     Mat_<Vec3b>::iterator it, itend;
     cvtColor(src, YCrCb_img, CV_BGR2YCrCb);
 
