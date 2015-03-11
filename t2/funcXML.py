@@ -54,7 +54,7 @@ def updateInfo (objectName, num, nom, area, perimetre, hue, file, root):
     for object in root.iter(OBJECT):
         name = object.get(NAME)
         if name == objectName:
-            object.find(NUM).text = object.find(NUM).text + ";" + num
+            object.find(NUM).text = num
             object.find(MOM).text = object.find(MOM).text + ";" + nom
             object.find(AREA).text = object.find(AREA).text + ";" + area
             object.find(PERIMETRE).text = object.find(PERIMETRE).text + ";" + perimetre
