@@ -25,13 +25,20 @@ def readInfo (objectName, root):
     for object in root.iter(OBJECT):
         name = object.get(NAME)
         if name == objectName:
-            return object.find(NUM).text, object.find(MOM).text, object.find(AREA).text, object.find(PERIMETRE).text,object.find(HUE_MOM).text, object.find(MOM_M).text, object.find(AREA_M).text, object.find(PERIMETRE_M).text,object.find(HUE_MOM_M).text, object.find(MOM_V).text, object.find(AREA_V).text, object.find(PERIMETRE_V).text,object.find(HUE_MOM_V).text
-    return "-1"
+            return [object.find(NUM).text, object.find(MOM).text, \
+                object.find(AREA).text, object.find(PERIMETRE).text,\
+                object.find(HUE_MOM).text, object.find(MOM_M).text,\
+                object.find(AREA_M).text, object.find(PERIMETRE_M).text,\
+                object.find(HUE_MOM_M).text, object.find(MOM_V).text,\
+                object.find(AREA_V).text, object.find(PERIMETRE_V).text,\
+                object.find(HUE_MOM_V).text]
+    return [-1]
 
 """
     Actualiza la informacion de media y varianza de un objeto
 """
-def updateInfoM_V (objectName, mom_m, area_m, perimetre_m, hue_m, mom_v, area_v, perimetre_v, hue_v, file, root):
+def updateInfoM_V (objectName, mom_m, area_m, perimetre_m, hue_m, mom_v, area_v,\
+    perimetre_v, hue_v, file, root):
     for object in root.iter(OBJECT):
         name = object.get(NAME)
         if name == objectName:
@@ -45,7 +52,7 @@ def updateInfoM_V (objectName, mom_m, area_m, perimetre_m, hue_m, mom_v, area_v,
             object.find(HUE_MOM_V).text = hue_v
             file.write(FILE)
             return
-    return "-1"
+    return -1
 
 """
     Acualiza un valor la informacion de un objeto
@@ -61,12 +68,13 @@ def updateInfo (objectName, num, nom, area, perimetre, hue, file, root):
             object.find(HUE_MOM).text = object.find(HUE_MOM).text + ";" + hue
             file.write(FILE)
             return
-    return "-1"
+    return -1
 
 """
     Crea el XML de un objeto y lo guarda
 """
-def createInfo (objectName, num, mom, area, perimetre, hue, mom_m, area_m, perimetre_m, hue_m, mom_v, area_v, perimetre_v, hue_v,file, root):
+def createInfo (objectName, num, mom, area, perimetre, hue, mom_m, area_m, \
+    perimetre_m, hue_m, mom_v, area_v, perimetre_v, hue_v,file, root):
     objectXML = et.Element(OBJECT)
     objectXML.set(NAME, objectName)
     root.append(objectXML)
