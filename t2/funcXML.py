@@ -42,14 +42,14 @@ def updateInfoM_V (objectName, mom_m, area_m, perimetre_m, hue_m, mom_v, area_v,
     for object in root.iter(OBJECT):
         name = object.get(NAME)
         if name == objectName:
-            object.find(MOM_M).text = mom_m
-            object.find(AREA_M).text = area_m
-            object.find(PERIMETRE_M).text = perimetre_m
-            object.find(HUE_MOM_M).text = hue_m
-            object.find(MOM_V).text = mom_v
-            object.find(AREA_V).text = area_v
-            object.find(PERIMETRE_V).text = perimetre_v
-            object.find(HUE_MOM_V).text = hue_v
+            object.find(MOM_M).text = str(mom_m)
+            object.find(AREA_M).text = str(area_m)
+            object.find(PERIMETRE_M).text = str(perimetre_m)
+            object.find(HUE_MOM_M).text = str(hue_m)
+            object.find(MOM_V).text = str(mom_v)
+            object.find(AREA_V).text = str(area_v)
+            object.find(PERIMETRE_V).text = str(perimetre_v)
+            object.find(HUE_MOM_V).text = str(hue_v)
             file.write(FILE)
             return
     return -1
@@ -61,11 +61,13 @@ def updateInfo (objectName, num, nom, area, perimetre, hue, file, root):
     for object in root.iter(OBJECT):
         name = object.get(NAME)
         if name == objectName:
-            object.find(NUM).text = num
-            object.find(MOM).text = object.find(MOM).text + ";" + nom
-            object.find(AREA).text = object.find(AREA).text + ";" + area
-            object.find(PERIMETRE).text = object.find(PERIMETRE).text + ";" + perimetre
-            object.find(HUE_MOM).text = object.find(HUE_MOM).text + ";" + hue
+            object.find(NUM).text = str(num)
+            object.find(MOM).text = object.find(MOM).text + ";" + str(nom)
+            object.find(AREA).text = object.find(AREA).text + ";" + str(area)
+            object.find(PERIMETRE).text = object.find(PERIMETRE).text + ";" +\
+                str(perimetre)
+            object.find(HUE_MOM).text = object.find(HUE_MOM).text + ";" +\
+                str(hue)
             file.write(FILE)
             return
     return -1
@@ -79,32 +81,32 @@ def createInfo (objectName, num, mom, area, perimetre, hue, mom_m, area_m, \
     objectXML.set(NAME, objectName)
     root.append(objectXML)
     numXML = et.SubElement(objectXML, NUM)
-    numXML.text = num
+    numXML.text = str(num)
     momXML = et.SubElement(objectXML, MOM)
-    momXML.text = mom
+    momXML.text = str(mom)
     areaXML = et.SubElement(objectXML, AREA)
-    areaXML.text = area
+    areaXML.text = str(area)
     perimetreXML = et.SubElement(objectXML, PERIMETRE)
-    perimetreXML.text = perimetre
+    perimetreXML.text = str(perimetre)
     hueXML = et.SubElement(objectXML, HUE_MOM)
-    hueXML.text = hue
+    hueXML.text = str(hue)
 
     mom_mXML = et.SubElement(objectXML, MOM_M)
-    mom_mXML.text = mom_m
+    mom_mXML.text = str(mom_m)
     area_mXML = et.SubElement(objectXML, AREA_M)
-    area_mXML.text = area_m
+    area_mXML.text = str(area_m)
     perimetre_mXML = et.SubElement(objectXML, PERIMETRE_M)
-    perimetre_mXML.text = perimetre_m
+    perimetre_mXML.text = str(perimetre_m)
     hue_mXML = et.SubElement(objectXML, HUE_MOM_M)
-    hue_mXML.text = hue_m
+    hue_mXML.text = str(hue_m)
 
     mom_vXML = et.SubElement(objectXML, MOM_V)
-    mom_vXML.text = mom_v
+    mom_vXML.text = str(mom_v)
     area_vXML = et.SubElement(objectXML, AREA_V)
-    area_vXML.text = area_v
+    area_vXML.text = str(area_v)
     perimetre_vXML = et.SubElement(objectXML, PERIMETRE_V)
-    perimetre_vXML.text = perimetre_v
+    perimetre_vXML.text = str(perimetre_v)
     hue_vXML = et.SubElement(objectXML, HUE_MOM_V)
-    hue_vXML.text = hue_v
+    hue_vXML.text = str(hue_v)
 
     file.write(FILE)

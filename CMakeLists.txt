@@ -7,7 +7,6 @@ set(OpenCV_DIR "/usr/local/Cellar/opencv/2.4.10.1/")
 find_package(OpenCV REQUIRED core imgproc highgui video)
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-set(SOURCE_FILES pr0.cpp)
-set(SOURCE_FILES pr1.cpp)
+set(SOURCE_FILES t2/main.cpp)
 add_executable(VisionPorComputadora ${SOURCE_FILES})
 target_link_libraries(VisionPorComputadora ${OpenCV_LIBS})
