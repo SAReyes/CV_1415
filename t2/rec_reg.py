@@ -33,7 +33,7 @@ def find_class(contour, name, contours, i, img):
     observado = np.repeat(observado, tall, axis=0)
 
     mahal = ((observado - descriptores['means']) ** 2) /\
-            (descriptores['vars']*descriptores['N']/descriptores['N']+(0.01*descriptores['means'])**2)
+            (descriptores['vars']*(np.array(descriptores['N'])-1)/descriptores['N']+(0.03*descriptores['means'])**2)
 
     print "mahal", mahal
     print "i", i, np.sum(mahal, axis=1)
