@@ -121,6 +121,10 @@ if __name__ == "__main__":
     info['means'] = means_m
     info['vars'] = vars_m
     info['names'] = info["data"].keys()
+    info['N'] = []
+    for key in info['names']:
+        info['N'].append(len(info['data'][key]['area']['data']))
+
     print "========================="
     print "Guardando descriptores en", DESCRIPTORES
     pickle.dump(info, open(DESCRIPTORES, 'wb'))
