@@ -1,6 +1,6 @@
 import cv2
 import func
-from sys import argv,exit
+from sys import argv, exit
 import pickle
 import numpy as np
 import pprint
@@ -19,7 +19,7 @@ nArea = 'area'
 nPer = 'perimeter'
 DESC = ['']
 cols = ['area', 'perimeter', 'hu_mom0', 'hu_mom1', 'hu_mom2', 'hu_mom3', 'hu_mom4', 'hu_mom5', 'hu_mom6']
-cols = cols[0:5] #usar hasta el tercer momento invariante
+cols = cols[0:5]  # usar hasta el tercer momento invariante
 
 
 def aprender(nom_fich, nom_obj, data):
@@ -74,10 +74,11 @@ def aprender(nom_fich, nom_obj, data):
         dummy_h[i][nMean] = np.mean(dummy_h[i][nData])
 
     # Obtiene la varianza de los objetos
-    dummy_m[nVar] = np.var(dummy_m[nData])
-    dummy_p[nVar] = np.var(dummy_p[nData])
+    dummy_m[nVar] = np.var(dummy_m[nData],ddof=1)
+
+    dummy_p[nVar] = np.var(dummy_p[nData],ddof=1)
     for i in hu_mom_range:
-        dummy_h[i][nVar] = np.var(dummy_h[i][nData])
+        dummy_h[i][nVar] = np.var(dummy_h[i][nData],ddof=1 )
 
     # Guarda la informacion en el fichero
     data[nom_obj]['area'] = dummy_m
@@ -101,6 +102,7 @@ if __name__ == "__main__":
         print "-------------------------"
         aprender(f, argv[len(argv) - 1], info["data"])
         print "DONE!"
+
 
     means_m = np.array(())
     vars_m = np.array(())

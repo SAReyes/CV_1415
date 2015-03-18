@@ -56,6 +56,6 @@ def descriptors(contours):
     @return: momentos, area, perimtero, momentos invariantes
     """
     mom = cv2.moments(contours, 1)
-    perimetre = cv2.arcLength(contours, False)
+    perimetre = cv2.arcLength(contours, True)
     hu_moments = cv2.HuMoments(mom)
     return mom, mom['m00'], perimetre, hu_moments.tolist()

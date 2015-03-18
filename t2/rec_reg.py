@@ -11,7 +11,7 @@ if len(argv) != 2:
     print "argumentos invalidos"
     sys.exit(-1)
 
-chi_square = 14.4494
+chi_square = 11.0705
 DESC_FILE = "descriptores.pickle"
 file_obj = argv[1]
 colors = {'circulo': (255, 129, 128),

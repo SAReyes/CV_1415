@@ -11,7 +11,7 @@ if len(argv) != 2:
     print "argumentos invalidos"
     sys.exit(-1)
 
-chi_square = 14.4494
+chi_square =  11.0705
 # chi_square = 12.59
 DESC_FILE = "descriptores.pickle"
 file_obj = argv[1]
@@ -33,7 +33,7 @@ def find_class(contour, name, contours, i, img):
     tall, _ = descriptores['means'].shape
     observado = np.repeat(observado, tall, axis=0)
 
-    mahal = ((observado - descriptores['means']) ** 2) / (descriptores['vars']*4/5+0.01*descriptores['means'])
+    mahal = ((observado - descriptores['means']) ** 2) / (descriptores['vars'])
 
     print "mahal", mahal
     print "i", i, np.sum(mahal, axis=1)
