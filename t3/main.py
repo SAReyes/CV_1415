@@ -43,8 +43,18 @@ cv2.imshow("Module", module_x)
 ori = np.arctan2(sobely, sobelx)
 ori_show = (ori/np.pi) * 128
 ori_show2 = ori_show.astype(np.uint8)
+
+"""
+for i in range(len(sobelx)):
+    for j in range(len(sobelx[i])):
+        ori_show2[i][j] = (np.arctan2(sobely[i][j], sobelx[i][j])/np.pi)*128
+
+print ori_show2
+#ori_show2 = ori_show2.astype(np.uint8)
+"""
 cv2.imshow("Orientacion", ori_show2)
 
+"""
 print "Schurr"
 #Scharr eje x
 scharrx = cv2.Scharr(imgGray, cv2.CV_8U, 1, 0)
@@ -76,7 +86,7 @@ ori = np.arctan2(scharry, scharrx)
 ori_show = (ori/np.pi) * 128
 ori_show2 = ori_show.astype(np.uint8)
 cv2.imshow("OrientacionS", ori_show2)
-
+"""
 
 while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
