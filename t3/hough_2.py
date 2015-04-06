@@ -7,6 +7,7 @@ def convert_float(array):
     """
         convierte una imagen en 32F o 64F a 8U, reescalando
         los valores, el mínimo se queda en 0 y el máximo en 255
+
         se hace de forma manual ya que opencv para python no
         dispone de Mat's
     """
@@ -72,57 +73,29 @@ for i in range(len(imgGray)):
     """
     for j in range(len(imgGray[i])):
         if module[i][j] >= UMBRAL:
-            theta = ori[i][j]
+            ang = ori[i][j]
             #Eliminamos las lineas verticales
-            if (np.abs(np.cos(theta))<0.9 and np.abs(np.cos(theta))>0.1):
+            if (np.abs(np.cos(ang))<0.9 and np.abs(np.cos(ang))>0.1):
                 """
-                    Calculamos la dirección de la recta
-                    cos -   |   cos +
-                    i +     |   i +
-                    ------------------
-                    cos -   |   cos +
-                    i -     |   i -
-                    Si el valor corresponde a los cuadrantes superiores la
-                    dirección de la recta es hacia la linea del horizonte,
-                    si se situa en los los cuadrantes inferiores es contraria,
-                    se aleja, de la lina del horizonte.
+                    Calcula los valores para representar la recta parametricamente
+                    a la cual pertenece los puntos i,j
                 """
-                if ((i < mean and np.cos(theta) > 0)\
-                    or (i > mean and np.cos(theta) < 0)):
-                    dir_ = 1
-                else:
-                    dir_ = -1
-                x = i
-                y = j
+                rho = j*np.cos(ang) + i*np.sin(ang)
                 """
-                    Calcula el siguiente punto de la recta a la cual pertenece
-                    el punto x,y - i,j-
+                    Despejamos donde corta la recta por la linea del horizonte
                 """
-                dummy_x = dir_*np.cos(theta)
-                dummy_y = dir_*np.sin(theta)
+                x = (-1)*((mean*np.sin(ang) - rho)/np.cos(ang))
+                x = int(x)
+                if x < ncolum and x >= 0:
+                    """
+                        Si el corte de la recta se encuentra dentro de la imagen
+                        votamos por ese punto en la recta
+                    """
+                    votos[x]=votos[x] + 1
+                    if (votos[x]>max_v):
+                        max_v = votos[x]
+                        y_v = x
 
-                while ((x>=0 and x<nrow) and (y>=0 and y<ncolum) and x!=mean):
-                    """
-                        Bucle que va "dibujando" la recta, hasta que se encuentra
-                        con la linea del horizonte o se sale de la imagen
-                    """
-                    x = x + dummy_x
-                    y = y + dummy_y
-                    round(x)
-                    round(y)
-
-                if x == mean:
-                    y = int(y)
-                    """
-                        Punto de la lina del horizonte donde ha cortado la recta,
-                        se suma un voto a ese punto de la linea del horizonte
-                        y comprueba si es el punto de la linea con más votos hasta el
-                        momento
-                    """
-                    votos[y]=votos[y] + 1
-                    if (votos[y]>=max_v):
-                        max_v = votos[y]
-                        y_v = y
 
 #Dibuja una cruz
 k = 0
