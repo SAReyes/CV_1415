@@ -3,7 +3,7 @@ import cv2
 import numpy as np
 import sys
 
-def convert_float(array):
+def normalize(array):
     """
         convierte una imagen en 32F o 64F a 8U, reescalando
         los valores, el mínimo se queda en 0 y el máximo en 255
@@ -43,10 +43,15 @@ imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 #Numero de colomunas y filas de la imagen
 ncolum = len(imgGray[0])
+
 nrow = len(imgGray)
 
 #Linea del horizonte
 mean = round(nrow / 2)
+
+votes_img = np.zeros((nrow,ncolum))
+lower_mean = int(mean + ncolum * 0.1)
+upper_mean = int(mean - ncolum * 0.1)
 
 print mean
 
@@ -96,7 +101,17 @@ for i in range(len(imgGray)):
                         max_v = votos[x]
                         y_v = x
 
+                    lower_x = int((-1)*((lower_mean*np.sin(ang) - rho)/np.cos(ang)))
+                    upper_x = int((-1)*((upper_mean*np.sin(ang) - rho)/np.cos(ang)))
+                    temp = np.zeros((nrow, ncolum))
+                    cv2.line(temp,(lower_x,lower_mean),(upper_x,upper_mean),(1),10)
+                    votes_img = votes_img + temp
+                    # cv2.line(img,(lower_x,lower_mean),(upper_x,upper_mean),(255,0,0),1)
 
+
+
+print np.argmax(votes_img) / ncolum, np.argmax(votes_img) % ncolum
+print mean, y_v
 #Dibuja una cruz
 k = 0
 while k < ncolum:
@@ -117,6 +132,13 @@ cv2.line(img, (i, j + offset), (i, j + offset + cross_size), (0, 0, 255),3)
 cv2.line(img, (i + offset, j), (i + offset + cross_size, j), (0, 0, 255),3)
 cv2.line(img, (i, j - offset), (i, j - offset - cross_size), (0, 0, 255),3)
 cv2.line(img, (i - offset, j), (i - offset - cross_size, j), (0, 0, 255),3)
+
+j = int(np.argmax(votes_img) / ncolum)
+i = int(np.argmax(votes_img) % ncolum)
+cv2.line(img, (i, j + offset), (i, j + offset + cross_size), (0, 255, 255),3)
+cv2.line(img, (i + offset, j), (i + offset + cross_size, j), (0, 255, 255),3)
+cv2.line(img, (i, j - offset), (i, j - offset - cross_size), (0, 255, 255),3)
+cv2.line(img, (i - offset, j), (i - offset - cross_size, j), (0, 255, 255),3)
 
 cv2.imshow("Punto de fuga", img)
 

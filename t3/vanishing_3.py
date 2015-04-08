@@ -74,7 +74,7 @@ while True:
         cv2.line(img, (i, j - offset), (i, j - offset - cross_size), (0, 0, 255),3)
         cv2.line(img, (i - offset, j), (i - offset - cross_size, j), (0, 0, 255),3)
 
-    cv2.imshow("Img", img)
+    cv2.imshow(str(images[image_index]), img)
     key = cv2.waitKey(1)
     if key & 0xFF == ord('q'):
         break
@@ -83,5 +83,6 @@ while True:
         HOUGH_THRESHOLD = 80
     elif key & 0xFF == ord('i'):
         HOUGH_THRESHOLD = 80
+        cv2.destroyWindow(images[image_index])
         image_index += 1
         image_index = image_index % len(images)
