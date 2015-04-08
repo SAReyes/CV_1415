@@ -28,7 +28,7 @@ def normalize(array):
     return (dummy / np.max(dummy) * 255).astype(np.uint8)
 
 def main():
-    img = cv2.imread('./ImagenesT2/poster.pgm')
+    img = cv2.imread('./vanishing_point/poster.pgm')
     imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     cv2.imshow("Image in gray scale", imgGray)
 

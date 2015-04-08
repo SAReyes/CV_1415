@@ -107,7 +107,18 @@ while k < nrow:
     imgGray[k][y_v]=0
     k=k+1
 
-cv2.imshow("Punto de fuga", imgGray)
+j = int(mean)
+i = y_v
+cross_size = int(ncolum * 0.1)
+offset = 5
+
+
+cv2.line(img, (i, j + offset), (i, j + offset + cross_size), (0, 0, 255),3)
+cv2.line(img, (i + offset, j), (i + offset + cross_size, j), (0, 0, 255),3)
+cv2.line(img, (i, j - offset), (i, j - offset - cross_size), (0, 0, 255),3)
+cv2.line(img, (i - offset, j), (i - offset - cross_size, j), (0, 0, 255),3)
+
+cv2.imshow("Punto de fuga", img)
 
 while True:
     if cv2.waitKey(1) & 0xFF == ord('q'):
