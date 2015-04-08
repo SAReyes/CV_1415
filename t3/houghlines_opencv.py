@@ -1,6 +1,6 @@
+# coding=utf-8
 """
-    Apartado opcional?
-    Esto es muuuuuuuuuuuuuuy guarro
+    Cálculo del punto de fuga usando HoughLines
 """
 import cv2
 import os
@@ -8,8 +8,6 @@ from sys import argv
 import numpy as np
 
 HOUGH_THRESHOLD = 80
-ALPHA = np.pi
-ALPHA_ERR = 0.5
 VERT_MULTIPLIER = float(argv[1])
 CAM = False
 
@@ -50,13 +48,12 @@ while True:
             x2 = int(x - 1000 * (-b))
             y2 = int(y - 1000 * (a))
             m = np.abs(np.arctan2(y2 - y1, x2 - x1))
-            if np.abs(m -ALPHA- np.pi/2) > ALPHA_ERR:
-                if (m > e and m < np.pi / 2 - e*VERT_MULTIPLIER) or (m > np.pi / 2 + e*VERT_MULTIPLIER and m < np.pi - e):
-                    ALPHA = m
-                    temp = np.zeros((rows, cols))
-                    cv2.line(temp, (x1, y1), (x2, y2), (1), 10)
-                    cv2.line(img, (x1, y1), (x2, y2), (255, 0, 0))
-                    dummy = dummy + temp
+            if (m > e and m < np.pi / 2 - e*VERT_MULTIPLIER) or (m > np.pi / 2 + e*VERT_MULTIPLIER and m < np.pi - e):
+                ALPHA = m
+                temp = np.zeros((rows, cols))
+                cv2.line(temp, (x1, y1), (x2, y2), (1), 10)
+                cv2.line(img, (x1, y1), (x2, y2), (255, 0, 0))
+                dummy = dummy + temp
 
         max_voted = np.max(dummy)
         if max_voted > 30:

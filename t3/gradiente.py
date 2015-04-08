@@ -51,7 +51,7 @@ def main():
     # -1 -2 -1
     # 0  0  0
     # 1  2  1
-    sobely = cv2.Sobel(imgGray, cv2.CV_32F, 0, 1, ksize=3)
+    sobely = cv2.Sobel(imgGray, cv2.CV_32F, 0, 1, ksize=3, scale=-1)
     sobely_show = normalize(sobely)
     cv2.imshow("SobelY", sobely_show)
 
@@ -69,7 +69,8 @@ def main():
     ##                      Orientanción                      ##
     ############################################################
     # cambia un poco, pero por el sobely
-    ori = np.arctan2(sobely, sobelx)
+    _, ori = cv2.cartToPolar(sobelx,sobely,angleInDegrees=True)
+    # ori = np.arctan2(sobely, sobelx)
     cv2.imshow("Orientacion", normalize(ori))
 
     while True:

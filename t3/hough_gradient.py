@@ -1,18 +1,11 @@
 # coding=utf-8
+"""
+    Cálculo del punto de fuga usando la transformada de Hough con su
+    gradiente
+"""
 import cv2
 import numpy as np
 import sys
-
-def normalize(array):
-    """
-        convierte una imagen en 32F o 64F a 8U, reescalando
-        los valores, el mínimo se queda en 0 y el máximo en 255
-
-        se hace de forma manual ya que opencv para python no
-        dispone de Mat's
-    """
-    dummy = array + np.abs(np.min(array))
-    return (dummy / np.max(dummy) * 255).astype(np.uint8)
 
 def sobel(img):
     """
@@ -53,8 +46,6 @@ votes_img = np.zeros((nrow,ncolum))
 lower_mean = int(mean + ncolum * 0.1)
 upper_mean = int(mean - ncolum * 0.1)
 
-print mean
-
 #Matriz de votos, iniciliazada a 0
 k = 0
 votos = []
@@ -89,6 +80,7 @@ for i in range(len(imgGray)):
                 """
                     Despejamos donde corta la recta por la linea del horizonte
                 """
+                #TODO: operaciones matriciales ...
                 x = (-1)*((mean*np.sin(ang) - rho)/np.cos(ang))
                 x = int(x)
                 if x < ncolum and x >= 0:
@@ -101,6 +93,10 @@ for i in range(len(imgGray)):
                         max_v = votos[x]
                         y_v = x
 
+                    """
+                        Dibuja la linea que entre los puntos que corta esta recta
+                        con las dos lineas que definene le horizonte
+                    """
                     lower_x = int((-1)*((lower_mean*np.sin(ang) - rho)/np.cos(ang)))
                     upper_x = int((-1)*((upper_mean*np.sin(ang) - rho)/np.cos(ang)))
                     temp = np.zeros((nrow, ncolum))
@@ -109,18 +105,6 @@ for i in range(len(imgGray)):
                     # cv2.line(img,(lower_x,lower_mean),(upper_x,upper_mean),(255,0,0),1)
 
 
-
-print np.argmax(votes_img) / ncolum, np.argmax(votes_img) % ncolum
-print mean, y_v
-#Dibuja una cruz
-k = 0
-while k < ncolum:
-    imgGray[mean][k]=0
-    k = k+1
-k = 0
-while k < nrow:
-    imgGray[k][y_v]=0
-    k=k+1
 
 j = int(mean)
 i = y_v
