@@ -49,19 +49,23 @@ def features(ftype, img):
     if ftype == "SHIFT":
         sift = cv2.SIFT()
         kp1, des1 = sift.detectAndCompute(img, None)
+        elapsed_time = time() - start_time
+        print "Tiempo en la ejecución: " + str(elapsed_time) + " segundos"
         return (kp1, des1)
     elif ftype == "SURF":
         surf = cv2.SURF()
         kp1, des1 = surf.detectAndCompute(img, None)
+        elapsed_time = time() - start_time
+        print "Tiempo en la ejecución: " + str(elapsed_time) + " segundos"
         return (kp1, des1)
     elif ftype == "ORB":
         orb = cv2.ORB()
         kp1, des1 = orb.detectAndCompute(img, None)
+        elapsed_time = time() - start_time
+        print "Tiempo en la ejecución: " + str(elapsed_time) + " segundos"
         return (kp1, des1)
     else:
         print "No existe el tipo"
-    elapsed_time = time() - start_time
-    print "Tiempo en la ejecución " + elapsed_time
 
 def matcher(ftype, kp1, kp2):
     """
