@@ -44,7 +44,6 @@ def stack_images(img1, img2, type):
         cv2.imshow("Matched_Ransac", matched)
         cv2.imshow("Manual_Matched", matched_mine)
         cv2.imshow("Pre-ransac", pre_ransac)
-
     # Posiciona la imagen en el centro
     t1 = np.array((1, 0, w2, 0, 1, h2, 0, 0, 1)).reshape(3, 3)
     H = t1.dot(H)
@@ -187,7 +186,7 @@ def RANSAC(matches, kp1, kp2, P):
 
             # TODO: Mejorable, en lugar de for, usa matrices ...
             if np.abs(p_match - pendiente_test) < 0.1 and \
-                            m.distance < P * match.distance:
+                            m.distance < 0.8 * match.distance:
                 votes.append(1)
             else:
                 votes.append(0)
@@ -220,14 +219,14 @@ def compare_key(key, char):
     return key & 0xff == ord(char)
 
 # TODO: preguntar esto como argumento del script
-MAX_WIDTH = 400.0
+MAX_WIDTH = 250.0
 MAX_STACKED_WIDTH = 1000.0
 MAX_STACKED_HEIGHT = 1000.0
 USING_CAMERA = False
-SHOW_MATCHES = True
+SHOW_MATCHES = True 
 if __name__ == '__main__':
     ftype = argv[1]
-    cap = cv2.VideoCapture(0)
+    cap = cv2.VideoCapture(1)
     cv2.namedWindow("Panorama")
     stacked = None
     while True:
