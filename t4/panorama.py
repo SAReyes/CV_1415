@@ -21,7 +21,10 @@ def stack_images(img1, img2, type):
 
     # Eliminación de espurios usando RANSAC
     # ransac_matched, H = RANSAC_OCV(goodMatch, kp1[0], kp2[0])
+    t_start = time()
     ransac_matched, H = RANSAC_OCV(goodMatch, kp1[0], kp2[0])
+    t_total = time() - t_start
+    print "--+Tiempo [findHomography]:", t_total, "segundos"
 
     if np.sqrt(abs(H[0, 2]) ** 2 + abs(H[1, 2] ** 2)) < MIN_DISTANCE_TRANSFORMED and not USING_CAMERA:
         return img1
@@ -31,7 +34,10 @@ def stack_images(img1, img2, type):
 
     # dibuja las features post-ransac
     if SHOW_MATCHES:
+        t_start = time()
         my_ran, _ = RANSAC(goodMatch, kp1[0], kp2[0], 0.99)
+        t_total = time() - t_start
+        print "--+Tiempo [Manual RANSAC]", t_total, "segundos"
         matched_mine = drawMatch(gray1, gray2, kp1[0], kp2[0], my_ran)
         matched = drawMatch(gray1, gray2, kp1[0], kp2[0], ransac_matched)
         pre_ransac = drawMatch(gray1, gray2, kp1[0], kp2[0], goodMatch)
@@ -54,7 +60,7 @@ def stack_images(img1, img2, type):
     (ystart, xstart, _), (ystop, xstop, _) = dummy.min(0), dummy.max(0) + 1
 
     elapsed = time() - start
-    print "Tiempo [stack]:", elapsed, "segundos"
+    print "+Tiempo [stack]:", elapsed, "segundos"
 
     return out[ystart:ystop, xstart:xstop, :]
 
@@ -164,27 +170,22 @@ def RANSAC(matches, kp1, kp2, P):
     matchesMask = None
     intentos = float("inf")
     while i < intentos:
-        print "Intentos:", intentos
+        # print "Intentos:", intentos
         muestra = np.random.randint(len(matches), size=k)
-        # TODO modelo con dos rectas?
-        # muestra = np.random.randint(len(matches), size=k)
-        # print "Muestra:",muestra, "|out of:", len(matches)
-        # m1 = matches[muestra[0]]
-        # m2 = matches[muestra[1]]
-        # print "size:", len(kp1),"|m1:",m1, m1.queryIdx, m1.trainIdx,"|m2:",m2, m2.queryIdx, m2.trainIdx
-        # print "points:",kp1[m1.queryIdx].pt,",",kp2[m1.trainIdx].pt,"|",kp1[m2.queryIdx].pt,",",kp2[m2.trainIdx].pt
 
-        # Modelo con una recta
         m = matches[muestra[0]]
         p1 = kp1[m.queryIdx].pt
         p2 = kp2[m.trainIdx].pt
         pendiente_test = np.arctan2(p1[1] - p2[1], p1[0] - p2[0])
-        distance_test = m.distance
         votes = []
         for match in matches:
             p1 = kp1[match.queryIdx].pt
             p2 = kp2[match.trainIdx].pt
             p_match = np.arctan2(p1[1] - p2[1], p1[0] - p2[0])
+            # votes = np.abs(p_match - pendiente_test) < 0.1 and \
+            #                 m.distance < P * match.distance
+
+            # TODO: Mejorable, en lugar de for, usa matrices ...
             if np.abs(p_match - pendiente_test) < 0.1 and \
                             m.distance < P * match.distance:
                 votes.append(1)
@@ -199,7 +200,7 @@ def RANSAC(matches, kp1, kp2, P):
             intentos = np.ceil(np.log(1 - P) / np.log(1 - p ** k))
 
 
-    print "Mask:", np.sum(matchesMask), len(matchesMask)
+    # print "Mask:", np.sum(matchesMask), len(matchesMask)
     return [a for a, b in zip(matches, matchesMask) if b == 1], None
 
 

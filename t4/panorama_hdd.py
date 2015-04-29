@@ -4,15 +4,13 @@ from sys import argv,exit
 import os
 import panorama
 
-dir_path = "./test/wave"
 if __name__ == '__main__':
-    # if len(argv) != 2:
-    #     print "Se necesitan dos parámetros: <descriptor> <directorio>"
-    #     exit(-1)
+    if len(argv) != 3:
+        print "Se necesitan dos parámetros: <descriptor> <directorio>"
+        exit(-1)
 
-    # dir_path = argv[2]
-    # ftype = argv[1]
-    ftype = "SIFT"
+    dir_path = argv[2]
+    ftype = argv[1]
     stacked = None
     for file in os.listdir(dir_path):
         print "file:", os.path.join(dir_path, file)
