@@ -17,16 +17,21 @@ def stack_images(img1, img2, type):
     # Computa los features
     kp1 = features(ftype, img1)
     kp2 = features(ftype, img2)
+    t_start = time()
     goodMatch, all_matched = matcher(ftype, kp1, kp2)
+    t_total = time() - t_start
+    print "-+Tiempo [matcher]:", t_total, "segundos"
 
     # Eliminación de espurios usando RANSAC
     # ransac_matched, H = RANSAC_OCV(goodMatch, kp1[0], kp2[0])
     t_start = time()
     ransac_matched, H = RANSAC_OCV(goodMatch, kp1[0], kp2[0])
     t_total = time() - t_start
-    print "--+Tiempo [findHomography]:", t_total, "segundos"
+    print "-+Tiempo [findHomography]:", t_total, "segundos"
 
-    if np.sqrt(abs(H[0, 2]) ** 2 + abs(H[1, 2] ** 2)) < MIN_DISTANCE_TRANSFORMED and not USING_CAMERA:
+    # if np.sqrt(abs(H[0, 2]) ** 2 + abs(H[1, 2] ** 2)) < MIN_DISTANCE_TRANSFORMED and USING_CAMERA:
+    #     return img1
+    if len(ransac_matched) < int(MIN_MATCHED):
         return img1
 
     h1, w1, _ = img1.shape
@@ -34,17 +39,14 @@ def stack_images(img1, img2, type):
 
     # dibuja las features post-ransac
     if SHOW_MATCHES:
-        t_start = time()
-        my_ran, _ = RANSAC(goodMatch, kp1[0], kp2[0], 0.99)
-        t_total = time() - t_start
-        print "--+Tiempo [Manual RANSAC]", t_total, "segundos"
-        matched_mine = drawMatch(gray1, gray2, kp1[0], kp2[0], my_ran)
         matched = drawMatch(gray1, gray2, kp1[0], kp2[0], ransac_matched)
         pre_ransac = drawMatch(gray1, gray2, kp1[0], kp2[0], goodMatch)
         cv2.imshow("Matched_Ransac", matched)
-        cv2.imshow("Manual_Matched", matched_mine)
+        cv2.imwrite(PREFIX_NAME + "_ransac.png", matched)
         cv2.imshow("Pre-ransac", pre_ransac)
+        cv2.imwrite(PREFIX_NAME + "_full_features.png", pre_ransac)
 
+    t_start = time()
     # Posiciona la imagen en el centro
     t1 = np.array((1, 0, w2, 0, 1, h2, 0, 0, 1)).reshape(3, 3)
     H = t1.dot(H)
@@ -54,10 +56,14 @@ def stack_images(img1, img2, type):
     tmp = np.array(np.nonzero(gray1))
     dummy[tmp[0, :] + h2, tmp[1, :] + w2, :] = img1[tmp[0, :], tmp[1, :], :]
     out = dummy
+    # tmp_img = img1.astype(np.int16)
+    # dummy[tmp[0, :] + h2, tmp[1, :] + w2, :] = (tmp_img[tmp[0, :], tmp[1, :], :] +dummy[tmp[0, :] + h2, tmp[1, :] + w2, :])/2
 
     # recorta zonas sin color
     dummy = np.argwhere(out)
     (ystart, xstart, _), (ystop, xstop, _) = dummy.min(0), dummy.max(0) + 1
+    t_total = time() - t_start
+    print "-+Tiempo [Construcción]:", t_total, "segundos"
 
     elapsed = time() - start
     print "+Tiempo [stack]:", elapsed, "segundos"
@@ -122,7 +128,6 @@ def matcher(ftype, kp1, kp2):
     """
     Encuentra coincidencias entre los descriptiroes mediante fuerza bruta
     """
-    RATIO = 0.75
     if ftype == "ORB":
         bf = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
         matches = bf.match(kp1[1], kp2[1])
@@ -187,7 +192,7 @@ def RANSAC(matches, kp1, kp2, P):
 
             # TODO: Mejorable, en lugar de for, usa matrices ...
             if np.abs(p_match - pendiente_test) < 0.1 and \
-                            m.distance < P * match.distance:
+                            m.distance < 0.8 * match.distance:
                 votes.append(1)
             else:
                 votes.append(0)
@@ -224,9 +229,13 @@ MAX_WIDTH = 400.0
 MAX_STACKED_WIDTH = 1000.0
 MAX_STACKED_HEIGHT = 1000.0
 USING_CAMERA = False
-SHOW_MATCHES = True
+SHOW_MATCHES = False
+PREFIX_NAME = ""
+MIN_MATCHED = 50
 if __name__ == '__main__':
     ftype = argv[1]
+    PREFIX_NAME = argv[2]
+    MIN_MATCHED = int(argv[3])
     cap = cv2.VideoCapture(0)
     cv2.namedWindow("Panorama")
     stacked = None
@@ -258,4 +267,4 @@ if __name__ == '__main__':
 
             cv2.imshow("Panorama", stacked)
 
-    cv2.imwrite("panorama.png", stacked)
+    cv2.imwrite(PREFIX_NAME + "_panorama.png", stacked)
